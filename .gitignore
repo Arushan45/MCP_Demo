@@ -1,0 +1,17 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.playwright-mcp/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+
+# Editor / OS
+.idea/
+.vscode/
+Thumbs.db
+
+# Misc local scratch
+Untitled
