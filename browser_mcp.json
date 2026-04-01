@@ -7,12 +7,13 @@
         ]
       },
       "airbnb": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@openbnb/mcp-server-airbnb"
-      ]
-    },
+        "command": "npx",
+        "args": [
+          "-y",
+          "@openbnb/mcp-server-airbnb",
+          "--ignore-robots-txt"
+        ]
+      },
     "duckduckgo-search": {
         "command": "npx",
         "args": [

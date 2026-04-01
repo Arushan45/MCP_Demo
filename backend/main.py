@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from .agent import run_agent
+from .agent import mcp_health_check, run_agent
 
 
 load_dotenv()
@@ -19,8 +19,13 @@ DEFAULT_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
 app = FastAPI(title="MCP Agent Backend")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3005",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3005",
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -43,13 +48,34 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/api/mcp-health")
+async def mcp_health() -> dict[str, Any]:
+    return await mcp_health_check(DEFAULT_MCP_CONFIG_PATH)
+
+
 @app.post("/api/agent", response_model=AgentResponse)
 async def agent(req: AgentRequest) -> Any:
     model = req.model or DEFAULT_MODEL
-    result = await run_agent(
-        req.prompt,
-        model=model,
-        config_path=DEFAULT_MCP_CONFIG_PATH,
-    )
-    return result
+    try:
+        result = await run_agent(
+            req.prompt,
+            model=model,
+            config_path=DEFAULT_MCP_CONFIG_PATH,
+        )
+        return result
+    except Exception as e:
+        return {
+            "final": "I hit a backend error while processing your request. Please try again.",
+            "tool_calls": [],
+            "tool_results": [
+                {
+                    "tool_name": "backend_exception",
+                    "server_name": "api",
+                    "isError": True,
+                    "content": "",
+                    "error": str(e),
+                }
+            ],
+            "initial_llm_content": "",
+        }
 

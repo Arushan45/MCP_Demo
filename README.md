@@ -40,6 +40,7 @@ This project demonstrates how to connect multiple MCP servers and bind their too
 4. Create a `.env` file:
    ```env
    GROQ_API_KEY=your_api_key_here
+   NEWSAPI_KEY=your_newsapi_key_here
    ```
 
 ## Run
